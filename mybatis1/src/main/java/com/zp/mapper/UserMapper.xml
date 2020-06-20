@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zp.mapper.UserMapper">
+    <select id="findUserById" parameterType="int" resultType="com.zp.model.User">
+        select * from user where id = #{value}
+    </select>
+    <select id="findUserByName" parameterType="String" resultType="com.zp.model.User">
+        select * from user where username like '%${value}%'
+    </select>
+    <!--如果继续使用select标签执行insert语句，通过sqlsession的insert可以执行，但是通过mapper的insert执行就不会提交数据-->
+    <insert id="insertUser" parameterType="com.zp.model.User">
+/*插入时返回主键的id*/
+<selectKey keyProperty="id" resultType="int" order="AFTER">
+select LAST_INSERT_ID()
+</selectKey>
+        insert into user(username,sex,birthday,address) value(#{username},#{sex},#{birthday},#{address})
+    </insert>
+    <delete id="deleteUser" parameterType="int">
+        delete from user where id = #{id}
+    </delete>
+    <update id="updateUser" parameterType="com.zp.model.User">
+update user set username = #{username} , sex = #{sex} , birthday = #{birthday} , address = #{address} where id = #{id}
+    </update>
+    <select id="findUserByUserQueryVO" parameterType="com.zp.pojo.UserQueryVO" resultType="user">
+select u.* from user u,orders o where u.id = o.user_id and u.id = #{user.id}
+    </select>
+    <select id="findUserByMap" parameterType="hashmap" resultType="user">
+        select * from user where username like '%${username}%'
+    </select>
+    <select id="userCount" resultType="int">
+        select count(*) from user
+    </select>
+    <!--在其他需要的地方可以使用include标签引入-->
+    <sql id="username_and_sex">
+        <if test="user != null and user != ''">
+            <if test="user.username != null and user.username != ''">
+                username like '%${user.username}%'
+            </if>
+            <if test="user.sex != null and user.sex != ''">
+                and sex= #{user.sex}
+            </if>
+        </if>
+    </sql>
+
+    <select id="findUserByUser" parameterType="com.zp.pojo.UserQueryVO" resultType="user">
+        select * from user
+        <where>
+        <include refid="username_and_sex"></include>
+        <!--<if test="user != null and user != ''">
+            <if test="user.username != null and user.username != ''">
+                username like '%${user.username}%'
+            </if>
+            <if test="user.sex != null and user.sex != ''">
+                and sex= #{user.sex}
+            </if>
+        </if>-->
+        </where>
+    </select>
+
+    <select id="findUserByIds" parameterType="com.zp.pojo.UserQueryVO" resultType="user">
+        select * from user
+        <where>
+            <if test="ids != null and ids.size >0">
+            <foreach collection="ids" item="id" open="id in (" close=")" separator=",">
+                ${id}
+            </foreach>
+            </if>
+        </where>
+    </select>
+    <!--此处的入参list可以写成全类名，java.util.List，foreach里的${id}可以换成#{id}-->
+    <select id="findUserByIdList" parameterType="list" resultType="user">
+        select * from user
+        <where>
+            <if test="list != null">
+                <foreach collection="list" item="id" open="id in (" close=")" separator=",">
+                    ${id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

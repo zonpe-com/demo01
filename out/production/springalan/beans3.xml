@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--开启注解-->
+    <context:annotation-config></context:annotation-config>
+    <!--注解位置-->
+    <context:component-scan base-package="com.zp"></context:component-scan>
+
+    <bean id="carService" class="com.zp.service.CarServiceImpl"></bean>
+    <bean id="myAspect3" class="com.zp.methods.MyAspect2"></bean>
+    <bean id="serviceProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <!--接口-->
+        <property name="interfaces" value="com.zp.service.CarService"></property>
+        <!--目标对象-->
+        <property name="target" ref="carService"></property>
+        <!--切面类-->
+        <property name="interceptorNames" value="myAspect3"></property>
+        <!--配置使用cglib实现代理对象，默认是动态代理实现-->
+        <!--<property name="optimize" value="true"></property>-->
+    </bean>
+</beans>
