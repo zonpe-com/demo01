@@ -69,12 +69,13 @@ select u.* from user u,orders o where u.id = o.user_id and u.id = #{user.id}
             </if>
         </where>
     </select>
+    <!--此处的入参list可以写成全类名，java.util.List，foreach里的${id}可以换成#{id}-->
     <select id="findUserByIdList" parameterType="list" resultType="user">
         select * from user
         <where>
             <if test="list != null">
                 <foreach collection="list" item="id" open="id in (" close=")" separator=",">
-                    #{id}
+                    ${id}
                 </foreach>
             </if>
         </where>
